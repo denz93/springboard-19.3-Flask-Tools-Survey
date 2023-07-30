@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>
+    {% block title %}
+      Compose new survey
+    {% endblock %}
+  </h1>  
+{% endblock %}
+
+{% block content %}
+  <a class="btn btn-primary mb-4" href="/">Back home</a>
+  <form action="/draft/survey" method="POST">
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="ig-survey-title" >Title</span>
+      <input name="title" type="text" class="form-control" placeholder="Survey's title" aria-label="Survey's title" aria-describedby="ig-survey-title" value="{{ draft_survey['title'] }}">
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="ig-survey-instructions">Instructions</span>
+      <textarea name="instructions" type="text" class="form-control" placeholder="Survey's instructions" aria-label="Survey's instructions" aria-describedby="ig-survey-instructions">{{ draft_survey['instructions'] }}</textarea>
+    </div>
+    <button class="btn btn-primary" name="update" value="true">Update</button>
+    <button class="btn btn-primary" name="publish" value="true">Publish</button>
+  </form>
+  <section class="mt-5">
+    <h3 class="mb-4">Questions</h3>
+    <table class="table align-middle">
+      <thead>
+        <tr>
+
+          <th>#</th>
+          <th>Question</th>
+          <th>Choices</th>
+          <th>Allow comment</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if draft_survey['questions'] | length == 0 %}
+          <tr>
+            <td colspan="4" class="text-center"><i>Empty question</i></td>
+          </tr>
+        {% else %}
+          {% for question in draft_survey['questions'] %}
+            <tr>
+              <td>{{loop.index0 + 1}}</td>
+              <td>{{question['question']}}</td>
+              <td>
+                {% for choice in question['choices'] %}
+                  <button class="btn btn-primary">{{choice}}</button>
+                {% endfor %}
+              </td>
+              <td>{{ "Yes" if question['allow_text'] else "No"}}</td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+      </tbody>
+    </table>
+  </section>
+  <section class="mt-5">
+    <h3 class="mb-4">Add question</h3>
+    <form class="d-flex flex-column gap-1" action="/draft/question" method="POST">
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="ig-survey-question">Question</span>
+        <input required name="question" type="text" class="form-control" placeholder="Content of question" aria-label="Survey's question" aria-describedby="ig-survey-question">
+      </div>
+      <div class="input-group mb-3">
+        <span class="input-group-text" id="ig-survey-choices">Choice</span>
+        <input required name="choice-input" type="text" class="form-control" placeholder='Ex: Yes|No' aria-label="Survey's question" aria-describedby="ig-survey-choices">
+        <button type="button" class="btn btn-secondary" onclick="(() => {
+          const choiceInput = document.querySelector('input[name=choice-input]')
+          const choiceList = document.getElementById('choice-list')
+          const value = choiceInput.value
+          if (!value) return
+
+          choiceInput.removeAttribute('required')
+          choiceInput.value = ''
+          choiceList.insertAdjacentHTML('beforeend',`<li class='list-group-item'>${value}<input hidden name='choices' value='${value}'></li>`)
+        })()">Add choice</button>
+      </div>
+      <div>
+        <label>Choice List:</label>
+        <ul id="choice-list" class="list-group list-group-horizontal mb-3">
+        </ul>
+      </div>
+      <div>
+        <label for="">Allow comment?</label>
+        <div class="form-check form-check-inline">
+          <input required class="form-check-input" type="radio" value="true" id="yes-comment" name="allow_text">
+          <label class="form-check-label" for="yes-comment">
+            Yes
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input required class="form-check-input" type="radio" value="false" id="no-comment" name="allow_text" checked>
+          <label class="form-check-label" for="no-comment">
+            No
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary align-self-start">Add</button>
+    </form>
+  </section>
+{% endblock %}

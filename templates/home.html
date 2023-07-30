@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>
+    {% block title %}
+      Surveys
+    {% endblock %}
+  </h1>
+{% endblock %}
+
+{% block content %}
+  <a class="btn btn-primary btn-large" href="/new-survey">Draft new survey</a>
+  <table class="table table-hover align-middle">
+    <thead>
+      <th scope="col">#</th>
+      <th scope="col">Survey</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </thead>
+    <tbody>
+
+      {% for survey_id, survey in surveys.items() %}
+      <tr>
+        <td>{{loop.index0 + 1}}</td>
+        <td>{{survey.title}}</td>
+        <td>
+          {% if answers_map[survey_id] | length > 0 %}{{answers_map[survey_id] | length}}/{% endif %}{{survey.questions | length}} questions
+        </td>
+        <td>
+          <form action="/surveys/{{survey_id}}" method="POST" class="list-item">
+            {% if answers_map[survey_id] | length < survey.questions | length %}
+              <button type="submit" class="btn btn-secondary">Start</button>
+            {% else %}
+              <button type="submit" class="btn btn-primary">View</button>
+
+            {% endif %}
+            
+          </form>
+
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>
+    {% block title %}
+      Thank you
+    {% endblock %}
+  </h1>
+{% endblock %}
+
+{% block content %}
+<h4>Your answers:</h4>
+
+  <table class="table">
+    <caption><strong>{{survey.title}}</strong></caption>
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Question</th>
+        <th scope="col">Answer</th>
+        <th scope="col">Comment</th> 
+      </tr>
+    </thead>
+    <tbody>
+
+      {% for question in survey.questions %}
+        <tr>
+          <th scope="row">{{loop.index0 + 1}}</th>
+          <td>{{question.question}}</td>
+          <td>{{answers[loop.index0 | string]['answer']}}</td>
+          {% if question['allow_text'] %}
+            
+          <td>{{answers[loop.index0 | string]['comment']}}</td>
+          {% else %}
+          <td><i class="bi bi-shield-x"></i></td>
+
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="/" class="btn btn-secondary">Back to surveys</a>
+{% endblock %}

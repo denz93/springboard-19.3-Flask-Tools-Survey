@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>
+    {% block title %}
+      Question {{question_id + 1}}
+    {% endblock %}
+  </h1>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex flex-column align-items-center gap-4">
+    <div class="progress">
+      {% for question in survey.questions %}
+        <form action="/surveys/{{survey_id}}/questions/{{loop.index0}}" method="get">
+          <button 
+            type="submit" 
+            class="circle {{'active' if loop.index0 == question_id}} {{'fill' if loop.index0 | string in answers}}">
+            {{loop.index0 + 1}}
+          </button>
+
+        </form>
+      {% endfor %}
+
+    </div>
+    <h4>{{question.question}}</h4>
+    <form 
+      action="/surveys/{{survey_id}}/questions/{{question_id}}" 
+      method="POST">
+      {% for choice in question.choices %}
+        <div class="form-check form-check-inline">
+          <input 
+            class="form-check-input" 
+            type="radio" 
+            name="answer" 
+            id="choice_{{loop.index0}}" 
+            value="{{choice}}"
+            required
+            {% if (question_id | string in answers) and answers[question_id | string]["answer"] == choice %}
+              checked
+            {% endif %}
+            
+            >
+          <label for="choice_{{loop.index0}}">{{choice}}</label>
+        </div>
+        
+      {% endfor %}
+      {% if question.allow_text %}
+          
+      <div class="input-group">
+        <span class="input-group-text">Comment</span>
+        <textarea class="form-control" aria-label="Comment" name="comment"></textarea>
+      </div>
+        {% endif %}
+      <div class="d-flex gap-3 justify-content-center mt-4">
+        <button class="btn btn-primary" type="submit" name="action" value="next">
+          {{'Next' if question_id < survey.questions | length else 'Submit'}}
+        </button>
+      </div>
+      
+    </form>
+    <a class="btn btn-default" href="/">Back to Surveys</a>
+
+  </div>
+{% endblock %}
